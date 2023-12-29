@@ -118,7 +118,6 @@ class SitemapParser
     conn = Faraday.new(url) do |f|
       f.request :retry, retry_options
       f.adapter :net_http
-      f.response :logger
     end
 
     response = conn.get
