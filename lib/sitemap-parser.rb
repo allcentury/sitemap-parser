@@ -2,10 +2,14 @@
 
 require 'nokogiri'
 require 'typhoeus'
+require 'faraday'
+require 'faraday/retry'
 require 'zlib'
 require_relative 'sitemap-parser/version'
 
 class SitemapParser
+  class HTTPError < StandardError; end
+
   attr_accessor :url, :options
 
   DEFAULT_OPTIONS = {
@@ -103,10 +107,21 @@ class SitemapParser
 
     request_options = options.dup.tap { |opts| opts.delete(:recurse); opts.delete(:url_regex) }
     request_options[:headers] = { 'User-Agent' => 'Sitemap-Parser' }
-    request = Typhoeus::Request.new(url, request_options)
 
-    response = request.run
-    raise "HTTP request to #{url} failed with code #{response.code}." unless response.success?
+    retry_options = {
+      max: 10,
+      interval: 0.05,
+      interval_randomness: 0.5,
+      backoff_factor: 2
+    }
+
+    conn = Faraday.new(url) do |f|
+      f.request :retry, retry_options
+      f.adapter :net_http
+      f.response :logger
+    end
+
+    response = conn.get
 
     inflate_body_if_needed(response)
   end

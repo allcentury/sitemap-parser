@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
   s.files = ['lib/sitemap-parser.rb', 'lib/sitemap-parser/version.rb']
   s.add_dependency('nokogiri', '>= 1.6')
   s.add_dependency('typhoeus', '>= 0.6', '< 2.0')
+  s.add_dependency('faraday', '>= 2.0', '< 3.0')
+  s.add_dependency('faraday-retry', '>= 2.0', '< 3.0')
   s.add_development_dependency('minitest', '>= 4.7')
   s.add_development_dependency('rake', '>= 10.4')
   s.add_development_dependency('rubocop', '~> 0.80')
